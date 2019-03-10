@@ -10,7 +10,7 @@ public class CoinManager : MonoBehaviour {
     public TextMeshProUGUI coinPerSecText = null;
     public TextMeshProUGUI multiplierText = null;
 
-    public float totalMoney = 10;
+    public float totalMoney = 50;
     private float totalMoneyPerSec = 0;
     public float multiplier = 1; // can become array of multipliers
 
@@ -27,6 +27,12 @@ public class CoinManager : MonoBehaviour {
         this.multiplier = coinManagerData.multiplier;
 
         OfflineIncome(lastSaveTime);
+    }
+
+    public void Initialise() {
+        totalMoney = 50;
+        totalMoneyPerSec = 0;
+        multiplier = 1;
     }
 
     void Update() {

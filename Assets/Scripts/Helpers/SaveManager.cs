@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 
@@ -10,9 +9,13 @@ public class SaveManager : MonoBehaviour {
     public CoinManager coinManager;
 
     private String saveFilePath;
+    private Boolean dontSave;
 
-    //it's static so we can call it from anywhere
     public void Save() {
+        if (dontSave) {
+            return;
+        }
+
         DateTime lastSaveTime = DateTime.UtcNow;
         CropsManagerData cropsManagerData = cropsManager.SaveData();
         CoinManagerData coinManagerData = coinManager.SaveData();
@@ -35,7 +38,9 @@ public class SaveManager : MonoBehaviour {
             cropsManager.LoadData(allSaveData.cropsManagerData);
             coinManager.LoadData(allSaveData.coinManagerData, allSaveData.lastSaveTime);
         } else {
-            cropsManager.StartNewGame();
+            cropsManager.Initialise();
+            coinManager.Initialise();
+            dontSave = false;
         }
     }
 
@@ -50,6 +55,7 @@ public class SaveManager : MonoBehaviour {
     }
 
     private void Start() {
+        dontSave = false;
         saveFilePath = Application.persistentDataPath + "/FirstIdleGameSave.data";
         Load();
 
@@ -58,7 +64,9 @@ public class SaveManager : MonoBehaviour {
     }
 
     public void DeleteSavedData() {
+        dontSave = true;
         File.Delete(saveFilePath);
+        Load();
     }
 
     [System.Serializable]
