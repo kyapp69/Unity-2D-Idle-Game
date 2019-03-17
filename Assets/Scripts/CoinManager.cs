@@ -47,12 +47,20 @@ public class CoinManager : MonoBehaviour {
         }
     }
 
-    public void CropClicked(float price, float coinIncrease, bool first) {
+    public void CropAutoIncome(float price, float coinIncrease, bool first) {
         totalMoney -= price;
         totalMoneyPerSec += coinIncrease;
         if (first) {
             cropsManager.UnlockNextCrop();
         }
+    }
+
+    public void CropSingleIncome(float price) {
+        totalMoney += 10 * price;
+    }
+
+    public void UnlockNextCrop() {
+        cropsManager.UnlockNextCrop();
     }
 
     public void rewardMultiplier() {
@@ -64,5 +72,7 @@ public class CoinManager : MonoBehaviour {
         TimeSpan timeSpan = DateTime.UtcNow - lastSaveTime;
         float income = (float) (0.1 * totalMoneyPerSec * timeSpan.TotalSeconds);
         Debug.Log("Income" + income);
+        totalMoney += income;
+        // todo later: show popup
     }
 }

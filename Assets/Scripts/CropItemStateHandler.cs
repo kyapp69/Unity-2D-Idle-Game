@@ -11,7 +11,8 @@ public class CropItemStateHandler : MonoBehaviour {
     public Crop thisCrop = null;
     public CoinManager coinManager;
     public Button buyButton;
-
+    public Button cropClickButton;
+    public ProgressBar progressBar;
 
     // Crop Fields
     private float coinTime;
@@ -34,32 +35,47 @@ public class CropItemStateHandler : MonoBehaviour {
         // Set Class Fields
         this.thisCrop = crop;
         this.coinManager = coinManager;
-        buyButton = this.GetComponentInChildren<Button>();
+        Button[] buttons = this.GetComponentsInChildren<Button>();
+
+        buyButton = buttons[0];
         buyButton.onClick.AddListener(OnBuyButtonClick);
+
+        progressBar = this.GetComponentInChildren<ProgressBar>();
+        cropClickButton = buttons[1];
+        cropClickButton.onClick.AddListener(OnCropClicked);
 
         price = crop.initialValue * 10;
         amount = 0;
         coinIncrease = crop.initialValue;
+        coinTime = crop.baseTime;
 
-        // set name
         Text[] texts = this.GetComponentsInChildren<Text>();
+        // Set crop name
         texts[0].text = crop.cropName;
 
-        // set button text
+        // Set button text
         refreshBarInfo();
-
-        // Calculate stuffs
-        coinTime = Mathf.Sqrt(crop.initialValue);
     }
 
     void OnBuyButtonClick() {
         if (coinManager.totalMoney >= price) {
-            coinManager.CropClicked(price, coinIncrease, (amount == 0));
+            if (amount == 0) {
+                coinManager.UnlockNextCrop();
+            }
             price *= PRICE_INCREASE_MULTIPLIER;
             amount++;
-            coinIncrease *= COIN_INCREASE_MULTIPLIER;
             refreshBarInfo();
         }
+    }
+
+    void OnCropClicked() {
+        if (amount > 0 && progressBar != null && !progressBar.running) {
+            progressBar.Execute(coinTime, ProgressBarFinished);
+        }
+    }
+
+    void ProgressBarFinished() {
+        coinManager.CropSingleIncome(amount * coinIncrease);
     }
 
     void refreshBarInfo() {
@@ -67,23 +83,7 @@ public class CropItemStateHandler : MonoBehaviour {
         buyButton.GetComponentInChildren<TextMeshProUGUI>().text = "COST:\n"+NumberFormatter.format(price);
         Text[] texts = this.GetComponentsInChildren<Text>();
         texts[1].text = "Amount: " + amount;
-        texts[2].text = "Next: +" + NumberFormatter.format(coinIncrease) + "(c)/sec";
+        // texts[2].text = "Next: +" + NumberFormatter.format(coinIncrease) + "(c)/sec";
     }
-
-    /*
-     * State:
-     *     NEW - (reduced text) - extra on click handler
-     *     Normal - >=1 seconds to cash - coin values
-     *     Fast - <1 seconds to cash - coinPerSecond values
-     *
-     * enable button if enough money
-     */
-
-    /*
-     * Button click
-     *     - Check current moneys (double check)
-     *     - If first time - call unlock next item (Crop Class)
-     *     - Increase coinnnnns ? Coin Manager
-     */
 
 }

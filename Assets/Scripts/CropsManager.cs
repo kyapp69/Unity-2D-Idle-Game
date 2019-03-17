@@ -63,7 +63,7 @@ public class CropsManager : MonoBehaviour {
     private void PopulateCropsList() {
         int value = 1;
         for (int i = 0; i < CROPS.Length; i++) {
-            CROPS_LIST.Add(new Crop(CROPS[i], value));
+            CROPS_LIST.Add(new Crop(CROPS[i], value, (float) (0.5 + (i * 0.2))));
             value = value * 4;
         }
     }
